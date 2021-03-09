@@ -17,8 +17,9 @@ app.use(function (req, res, next) {
 app.use(bodyParser.json());
 
 
-app.use('/api/kafkajs', require('../routes/kafkajs'));
-app.use('/api/kafkanode', require('../routes/kafkanode'));
+app.use('/api/request', require('../routes/request'));
+app.use('/api/status', require('../routes/status'));
+// app.use('/api/kafkanode', require('../routes/kafkanode'));
 
 const PORT = config.get('port') || 7071;
 
