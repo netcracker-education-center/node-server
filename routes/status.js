@@ -61,7 +61,7 @@ router.get('/getStatus', async (req, res) => {
 const run = async () => {
     const consumer = kafka.consumer({ groupId: 'UIConsumers2' });
 
-    let topic = 'status-topic'
+    let topic = 'request-status-topic'
 
     await consumer.connect()
     console.log('connected to status-topic')
