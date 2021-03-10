@@ -20,11 +20,24 @@ router.post('/push', async (req, res) => {
         // console.log("req.body: "+ req);
         // console.log("req.body: "+ req.body);
         let msg = {
-            ticketSystem: req.body.ticketSystem,
-            login: req.body.login,
-            password: req.body.password,
-            url: req.body.url,
-            userId: req.body.userId
+            "jiraChecked": req.body.jiraChecked,
+            "ticketSystem": req.body.ticketSystem,
+            "login": req.body.email,
+            "password": req.body.tocken,
+            "url": req.body.url,
+
+            "ftpChecked": req.body.ftpChecked,
+            "ftpLogin": req.body.ftpLogin,
+            "ftpPassword": req.body.ftpPassword,
+            "ftpPort": req.body.ftpPort,
+            "ftpServer": req.body.ftpServer,
+            "ftpDirPath": req.body.ftpDirPath,
+            "ftpExtention": req.body.ftpExtention,
+            "ftpDate": req.body.ftpDate,
+
+            "keyWords": req.body.keyWords,
+
+            "userId": req.body.userId
         }
         console.log(JSON.stringify(msg));
 
@@ -52,8 +65,8 @@ router.post('/get', async (req, res) => {
 
     //let userData = consumerData.map((v) => { if (JSON.stringify(v.userId) === userId) { return v } })
     let userData = consumerData.map((v) => {
-        console.log( {'consumerData.userId': JSON.stringify(v.userId)} );
-        console.log( `${v.userId===req.body.userId}`);
+        console.log({ 'consumerData.userId': JSON.stringify(v.userId) });
+        console.log(`${v.userId === req.body.userId}`);
         return v;
     })
 
