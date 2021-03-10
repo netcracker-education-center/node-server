@@ -54,6 +54,56 @@ router.get('/getStatus', async (req, res) => {
 
 })
 
+router.post('/getSimpleStatus', async (req, res) => {
+    //Simple array of user statuses
+    let resultStatuses = [
+        {
+            messages: {
+                requestId: '1111',
+                userId: '123212321323',
+                date: '12-12-12',
+                keyWords: 'How to ...',
+                status: 'In process'
+            },
+            timestamp: 10
+        },
+        {
+            messages: {
+                requestId: '2222',
+                userId: '123212321323',
+                date: '12-12-12',
+                keyWords: 'Why...',
+                status: 'Done'
+            },
+            timestamp: 12
+        },
+        {
+            messages: {
+                requestId: '3333',
+                userId: '123212321323',
+                date: '12-12-12',
+                keyWords: 'Any words...',
+                status: 'Done'
+            },
+            timestamp: 13
+        },
+        {
+            messages: {
+                requestId: '4444',
+                userId: '123212321323',
+                date: '12-12-12',
+                keyWords: 'Wtf bro?',
+                status: 'In process'
+            },
+            timestamp: 14
+        }];
+
+        resultStatuses.forEach(v=>console.log(v.timestamp));
+    //Return latest statuses
+    res.send(resultStatuses)
+
+})
+
 
 /**
  * Consumer, which collect all msg (request statuses)
