@@ -3,29 +3,31 @@ name: build
 on:
   push:
     branches: 
-      - "main"
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-
-    - name: Copu file via scrip
-      uses: appleboy/scp-action@master
+    - name: Use Node.js 13.10
+      uses: actions/setup-node@v1
       with:
-        host: ${{secrets.SSH_HOST}}
-        key: ${{secrets.SSH_KEY}}
-        username: ${{secrets.SSH_USERNAME}}
-        passphrase: ${{secrets.PASSPHRASE}}
-        # host: 142.93.122.167
-        # #key: ${{secrets.SSH_KEY}}
-        # username: netcracker
-        # password: NET21dc
-        source: "."
-        target: "/home/netcracker/ui/node-server"
-
-    - name: Executing remote command
+        node-version: '13.10'
+    - name: Install npm
+      run: |
+        npm install --legacy-peer-deps
+    - name: Publish to Github Packages Registry
+      uses: docker/build-push-action@v1
+      with:
+        repository: netcracker-education-center/node-server/nodedocker
+        registry: docker.pkg.github.com
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        dockerfile: Dockerfile
+        tags: latest
+        tag_with_ref: true
+    - name: Deploy package to digitalocean
       uses: appleboy/ssh-action@v0.1.2
       with:
         host: ${{secrets.SSH_HOST}}
@@ -33,55 +35,13 @@ jobs:
         username: ${{secrets.SSH_USERNAME}}
         passphrase: ${{secrets.PASSPHRASE}}
         script: |
-          cd /home/netcracker/ui
-          docker-compose down
-          docker-compose -f docker-compose.yml up
-
-
-
-
-
-      # #stop containers
-      # docker stop $(docker ps -aqf "name=frontend")
-      # docker stop $(docker ps -aqf "name=backend" 
-      # #delete containers
-      # docker rm $(docker ps -aqf "name=frontend")         
-      # docker rm $(docker ps -aqf "name=backend" 
-      # #run docker-compose
-      # docker-compose -f docker-compose.yml up       
-
-    # - name: Use Node.js 13.10
-    #   uses: actions/setup-node@v1
-    #   with:
-    #     node-version: '13.10'
-    # - name: Install npm and run unittest
-    #   run: |
-    #     npm install --legacy-peer-deps
-    # - name: Publish to Github Packages Registry
-    #   uses: docker/build-push-action@v1
-    #   with:
-    #     repository: netcracker-education-center/collect-and-search-ui/reactimage
-    #     registry: docker.pkg.github.com
-    #     username: ${{ github.actor }}
-    #     password: ${{ secrets.GITHUB_TOKEN }}
-    #     dockerfile: Dockerfile
-    #     tags: latest
-    #     tag_with_ref: true
-    # - name: Deploy package to digitalocean
-    #   uses: appleboy/ssh-action@v0.1.2
-    #   with:
-    #     host: ${{secrets.SSH_HOST}}
-    #     key: ${{secrets.SSH_KEY}}
-    #     username: ${{secrets.SSH_USERNAME}}
-    #     passphrase: ${{secrets.PASSPHRASE}}
-    #     script: |
-    #       cd netcracker/education-center/collect-and-search/collect-and-search-ui
-    #       docker login https://docker.pkg.github.com -u ${{github.repository_owner}} -p ${{secrets.GITHUB_TOKEN}}
-    #       docker container stop $(docker ps -aqf "name=reactimage")
-    #       docker container rm $(docker ps -aqf "name=reactimage")
-    #       docker image rm netcracker/reactimage
-    #       docker image rm docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/reactimage
-    #       docker pull docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/reactimage:latest
-    #       docker tag docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/reactimage:latest netcracker/reactimage:latest
-    #       # -d means that container starts in detached mode or in the background
-    #       docker run -d --name reactimage -p 7070:7070 netcracker/reactimage:latest 
+          cd netcracker/education-center/collect-and-search/node-server
+          docker login https://docker.pkg.github.com -u ${{github.repository_owner}} -p ${{secrets.GITHUB_TOKEN}}
+          docker container stop $(docker ps -aqf "name=nodedocker")
+          docker container rm $(docker ps -aqf "name=nodedocker")
+          docker image rm netcracker/nodedocker
+          docker image rm docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker
+          docker pull docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest
+          docker tag docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest netcracker/nodedocker:latest
+          # -d means that container starts in detached mode or in the background
+          docker run -m 64m -d --name nodedocker -p 7070:7070 netcracker/nodedocker:latest
