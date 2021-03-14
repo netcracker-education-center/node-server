@@ -1,7 +1,6 @@
 const express = require("express");
 const config = require('config');
-const bodyParser = require('body-parser');
-
+const PORT = config.get('port') || 7071;
 
 
 
@@ -14,16 +13,19 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: true
+}));
 
 
 app.use('/api/request', require('./routes/request'));
 app.use('/api/status', require('./routes/status'));
+app.use('/api/report', require('./routes/report'));
 // app.use('/api/kafkanode', require('../routes/kafkanode'));
-
-const PORT = config.get('port') || 7071;
-
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
+
+
