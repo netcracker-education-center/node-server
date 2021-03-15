@@ -44,4 +44,4 @@ jobs:
           docker pull docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest
           docker tag docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest netcracker/nodedocker:latest
           # -d means that container starts in detached mode or in the background
-          docker run -m 64m -d --name nodedocker -p 7070:7070 netcracker/nodedocker:latest
+          docker run -d --name nodedocker -p 7071:7071 netcracker/nodedocker:latest
