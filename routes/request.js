@@ -16,17 +16,20 @@ const kafka = new Kafka({
 router.post('/push', async (req, res) => {
     try {
         let msg = {
+            'jiraIssues': {
                 'jiraChecked': req.body.jiraChecked,
                 'jiraJQLRequest': req.body.jiraJQLRequest,
                 'jiraIssuesDate': req.body.jiraIssuesDate,
                 'jiraIssuesStatus': req.body.jiraIssuesStatus,
-                'keywords': req.body.keywords,
+            },
+
+            'ftpFiles': {
                 'ftpChecked': req.body.ftpChecked,
                 'pathToDir': req.body.pathToDir,
                 'extensionFilter': req.body.ftpExtention,
                 'dataFilter': req.body.ftpDate,
-                'keywords': req.body.keywords
-
+            },
+            'keywords': req.body.keywords
         }
         console.log(JSON.stringify(msg));
 
