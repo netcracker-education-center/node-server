@@ -20,14 +20,14 @@ router.post('/push', async (req, res) => {
                 'jiraChecked': req.body.jiraChecked,
                 'jiraJQLRequest': req.body.jiraJQLRequest,
                 'jiraIssuesDate': req.body.jiraIssuesDate,
-                'jiraIssuesStatus': req.body.jiraIssuesStatus,
+                'jiraIssuesStatus': req.body.jiraIssuesStatus
             },
 
             'ftpFiles': {
                 'ftpChecked': req.body.ftpChecked,
                 'pathToDir': req.body.pathToDir,
                 'extensionFilter': req.body.ftpExtention,
-                'dataFilter': req.body.ftpDate,
+                'dataFilter': req.body.ftpDate
             },
             'keywords': req.body.keywords
         }
