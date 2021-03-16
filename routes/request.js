@@ -17,18 +17,17 @@ router.post('/push', async (req, res) => {
     try {
         let msg = {
             'jiraIssues': {
-                'jiraChecked': req.body.jiraChecked,
                 'jiraJQLRequest': req.body.jiraJQLRequest,
                 'jiraIssuesDate': req.body.jiraIssuesDate,
                 'jiraIssuesStatus': req.body.jiraIssuesStatus
             },
 
             'ftpFiles': {
-                'ftpChecked': req.body.ftpChecked,
                 'pathToDir': req.body.pathToDir,
                 'extensionFilter': req.body.ftpExtention,
                 'dataFilter': req.body.ftpDate
             },
+            
             'keywords': req.body.keywords
         }
         console.log(JSON.stringify(msg));
