@@ -7,7 +7,6 @@ statusHistory = new StatusConsumer().getStatusHistory();
  * Return latest status of all user's requestes
  */
 router.post('/get', async (req, res) => {
-    // let userId = req.body.userId;
 
     //If dosn't found any status, return null
     if (statusHistory === null) {
