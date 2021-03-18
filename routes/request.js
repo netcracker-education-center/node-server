@@ -1,7 +1,7 @@
 const { Router } = require('express');
+const logger = require('../config/Logger')('../logs/Request.log');
 const router = Router();
 const config = require('config');
-
 
 const { Kafka } = require('kafkajs');
 
@@ -30,25 +30,25 @@ router.post('/push', async (req, res) => {
 
             'keywords': req.body.keywords
         }
-        console.log(JSON.stringify(msg));
+        logger.info(` Sended message: ${JSON.stringify(msg)}`);
 
-        const producer = kafka.producer()
+        const producer = kafka.producer();
 
-        await producer.connect()
+        await producer.connect();
         await producer.send({
             topic: 'listening.ui.request',
             messages: [
                 { value: JSON.stringify(msg) },
-            ],
-        })
+            ]
+        });
 
-        await producer.disconnect()
+        await producer.disconnect();
 
         return res.status(200).json({ message: 'Message, sended!' })
     } catch (e) {
-        console.log(e)
-        res.status(500).json({ e })
+        logger.error(`Enything went wrong while sending request. Current exception: ${e}`);
+        res.status(500).json(`Enything went wrong while sending request. Current exception: ${e}`);
     }
-})
+});
 
 module.exports = router;

@@ -23,6 +23,7 @@
     "config": "^3.3.4",
     "express": "^4.17.1",
     "kafkajs": "^1.15.0",
+    "log4js": "^6.3.0",
     "mongodb": "^3.6.4",
     "mongoose": "^5.12.0"
   },

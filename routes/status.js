@@ -1,21 +1,8 @@
 const { Router } = require('express');
+const StatusConsumer = require('../consumers/StatusConsumer');
 const router = Router();
-const config = require('config');
 
-
-const { Kafka } = require('kafkajs');
-
-const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
-    brokers: [config.get('kafkaBroker')]
-});
-
-/**
- * All statuses from topic
- */
-let statusHistory = [];
-
-
+statusHistory = new StatusConsumer().getStatusHistory();
 /**
  * Return latest status of all user's requestes
  */
@@ -50,36 +37,64 @@ router.post('/get', async (req, res) => {
     res.send(resultStatuses)
 });
 
-
 /**
- * Consumer, which collect all msg (request statuses)
+ * Statuses for testing
  */
-const statusConsumer = async () => {
-    const consumer = kafka.consumer({ groupId: 'UIRequestStatuses' });
-
-    let topic = 'analysis-topic'
-
-    await consumer.connect()
-    console.log('connected to: ' + topic)
-    await consumer.subscribe({ topic, fromBeginning: false })
-
-    //get each message and save it to statusHistory array
-    consumer.run({
-
-        eachMessage: async ({ topic, partition, message }) => {
-            console.log('Getting statuses....');
-            let msg = JSON.parse(message.value.toString());
-            console.log(msg);
-
-            statusHistory.push({
-                message: msg,
-                timestamp: message.timestamp
-            });
+router.post('/getSimpleStatus', async (req, res) => {
+    //Simple array of user statuses
+    let resultStatuses = [
+        {
+            messages: {
+                requestId: '1111',
+                userId: '123212321323',
+                date: '12-12-12',
+                keywords: 'How to ...',
+                status: 'IN PROCESS'
+            },
+            timestamp: 10
         },
-    })
-}
-
-statusConsumer().catch(e => console.error(`[example/consumer] ${e.message}`, e))
-
+        {
+            messages: {
+                requestId: '2222',
+                userId: '123212321323',
+                date: '12-12-12',
+                keywords: 'Why...',
+                status: 'COMPLETED'
+            },
+            timestamp: 12
+        },
+        {
+            messages: {
+                requestId: '3333',
+                userId: '123212321323',
+                date: '12-12-12',
+                keywords: 'Any words...',
+                status: 'COMPLETED'
+            },
+            timestamp: 13
+        },
+        {
+            messages: {
+                requestId: '4444',
+                userId: '123212321323',
+                date: '12-12-12',
+                keywords: 'Wtf bro?',
+                status: 'IN PROCESS'
+            },
+            timestamp: 14
+        },
+        {
+            messages: {
+                requestId: '555',
+                userId: '123212321323',
+                date: '12-12-12',
+                keywords: 'Check bootstrap table border...',
+                status: 'COMPLETED'
+            },
+            timestamp: 15
+        }];
+    //Return latest statuses
+    res.send(resultStatuses);
+});
 
 module.exports = router;

@@ -1,19 +1,9 @@
 const { Router } = require('express');
 const router = Router();
-const config = require('config');
+const logger = require('../config/Logger')('../logs/Report.log');
+const ReportHistory = require('../consumers/ReportConsumer');
 
-
-const { Kafka } = require('kafkajs');
-
-const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
-    brokers: [config.get('kafkaBroker')]
-});
-
-/**
- * Last 5 user reports
- */
- let reportHistory = [];
+const reportHistory = new ReportHistory().getReports();
 
  /**
   * Get report by reqId
@@ -73,58 +63,26 @@ const produceReport = async (id) => {
         //message for topic
         let msg = {
             requestId: id
-        }
+        };
 
-        console.log(JSON.stringify(msg));
+        logger.info(`Request to get report by requestId: ${JSON.stringify(msg)} sended.`);
 
-        const producer = kafka.producer()
+        const producer = kafka.producer();
 
-        await producer.connect()
+        await producer.connect();
         await producer.send({
             topic: topic,
             messages: [
                 { value: JSON.stringify(msg) },
-            ],
-        })
+            ]
+        });
+        await producer.disconnect();
+        return res.status(200).json({ message: 'Message, sended!' });
 
-        await producer.disconnect()
-
-        return res.status(200).json({ message: 'Message, sended!' })
     } catch (e) {
-        console.log(e)
-        res.status(500).json({ e })
+        logger.error(`Enything while sending request went wrong ${e}`);
+        res.status(500).json({ e });
     }
 }
-
-
-/**
- * Consumer, which get message from topic "reports" and save it to local file
- */
- const reportConsumer = async () => {
-    const consumer = kafka.consumer({ groupId: 'UIGetReports' });
-
-    let topic = 'reports'
-
-    await consumer.connect()
-    console.log('connected to: ' + topic)
-    await consumer.subscribe({ topic, fromBeginning: false })
-
-    //get each message and save it to statusHistory array
-    consumer.run({
-
-        eachMessage: async ({ topic, partition, message }) => {
-            console.log('Getting statuses....');
-            let msg = JSON.parse(message.value.toString());
-            console.log(msg);
-
-            reportHistory.push({
-                message: msg,
-                timestamp: message.timestamp
-            });
-        },
-    })
-}
-
-reportConsumer().catch(e => console.error(`[example/consumer] ${e.message}`, e))
 
 module.exports = router;

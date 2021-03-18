@@ -1,5 +1,6 @@
 const express = require("express");
 const config = require('config');
+const logger = require('./config/Logger')('./logs/App.log');
 const PORT = config.get('port') || 7071;
 
 
@@ -25,7 +26,7 @@ app.use('/api/report', require('./routes/report'));
 // app.use('/api/kafkanode', require('../routes/kafkanode'));
 
 app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
+    logger.info(`Server listening on ${PORT}`);
 });
 
 
