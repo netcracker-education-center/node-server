@@ -105,3 +105,6 @@ dist
 
 # Logs dir
 logs/
+
+#package.json
+package.json
