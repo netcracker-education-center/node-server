@@ -3,7 +3,7 @@ name: build
 on:
   push:
     branches: 
-      - "main"
+      - "kafka-using"
 
 jobs:
   build:
