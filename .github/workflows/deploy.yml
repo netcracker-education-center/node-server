@@ -35,7 +35,7 @@ jobs:
         username: ${{secrets.SSH_USERNAME}}
         passphrase: ${{secrets.PASSPHRASE}}
         script: |
-          cd netcracker/education-center/collect-and-search/node-server
+          cd netcracker/collect-and-search/node-server
           docker login https://docker.pkg.github.com -u ${{github.repository_owner}} -p ${{secrets.GITHUB_TOKEN}}
           docker container stop $(docker ps -aqf "name=nodedocker")
           docker container rm $(docker ps -aqf "name=nodedocker")
