@@ -1,0 +1,34 @@
+{
+  "name": "node-server",
+  "version": "1.0.0",
+  "description": "Server for our UI on NodeJS",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --trace-warnings app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netcracker-education-center/node-server.git"
+  },
+  "author": "Grigoryan Andranik <ando0000.grig0ryan@yandex.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/netcracker-education-center/node-server/issues"
+  },
+  "homepage": "https://github.com/netcracker-education-center/node-server#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "config": "^3.3.4",
+    "express": "^4.17.1",
+    "kafkajs": "^1.15.0",
+    "log4js": "^6.3.0",
+    "mongodb": "^3.6.4",
+    "mongoose": "^5.12.0"
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7"
+  }
+}
