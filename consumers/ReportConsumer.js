@@ -16,10 +16,11 @@ class ReportConsumer {
         this.reportHistory = [];
         reportConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
     }
+    
     /**
     * Consumer, which get message from topic "reports" and save it to local file
     */
-    reportConsumer = async () => {
+     async reportConsumer(){
         try {
 
             const consumer = kafka.consumer({ groupId: 'UIGetReports' });
@@ -50,7 +51,7 @@ class ReportConsumer {
      * 
      * @returns reports from current history
      */
-    getReports = () => {
+    getReports() {
         return this.reportHistory;
     }
 }

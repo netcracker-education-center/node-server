@@ -18,7 +18,7 @@ class StatusConsumer {
 
     }
 
-    statusConsumer = async () => {
+    async statusConsumer(){
         try {
 
             const consumer = kafka.consumer({ groupId: 'UIRequestStatuses' });
@@ -50,7 +50,7 @@ class StatusConsumer {
      * 
      * @returns status history from kafka
      */
-    getStatusHistory = () => {
+    getStatusHistory() {
         return this.statusHistory;
     }
 }
