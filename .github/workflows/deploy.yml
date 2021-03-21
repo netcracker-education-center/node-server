@@ -35,13 +35,13 @@ jobs:
         username: ${{secrets.SSH_USERNAME}}
         passphrase: ${{secrets.PASSPHRASE}}
         script: |
-          cd netcracker/education-center/collect-and-search/node-server
+          cd netcracker/collect-and-search/node-server
           docker login https://docker.pkg.github.com -u ${{github.repository_owner}} -p ${{secrets.GITHUB_TOKEN}}
           docker container stop $(docker ps -aqf "name=nodedocker")
           docker container rm $(docker ps -aqf "name=nodedocker")
           docker image rm netcracker/nodedocker
-          docker image rm docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker
-          docker pull docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest
-          docker tag docker.pkg.github.com/netcracker-education-center/collect-and-search-ui/nodedocker:latest netcracker/nodedocker:latest
+          docker image rm docker.pkg.github.com/netcracker-education-center/node-server/nodedocker
+          docker pull docker.pkg.github.com/netcracker-education-center/node-server/nodedocker:latest
+          docker tag docker.pkg.github.com/netcracker-education-center/node-server/nodedocker:latest netcracker/nodedocker:latest
           # -d means that container starts in detached mode or in the background
           docker run -d --name nodedocker -p 7071:7071 netcracker/nodedocker:latest
