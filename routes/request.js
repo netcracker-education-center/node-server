@@ -10,7 +10,7 @@ const logger = log4js.getLogger('request');
 const { Kafka } = require('kafkajs');
 
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
+    clientId: config.get('kafkaClientIdRequest'),
     brokers: [config.get('kafkaBroker')]
 });
 
@@ -36,7 +36,7 @@ router.post('/push', async (req, res) => {
         }
         logger.info(` Sended message: ${JSON.stringify(msg)}`);
 
-        const producer = kafka.producer();
+        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
         await producer.connect();
         await producer.send({

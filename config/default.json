@@ -2,5 +2,7 @@
     "port": 7071,
     "kafkaBroker": "206.81.22.187:9092",
     "kafkaClientIdStatusConsumer": "UIStatusConsumer",
-    "kafkaClientIdReportConsumer": "UIReportConsumer"
+    "kafkaClientIdReportConsumer": "UIReportConsumer",
+    "kafkaClientIdRequest": "UIRequestProducer",
+    "kafkaClientIdReport": "UIReportProducer"
 }

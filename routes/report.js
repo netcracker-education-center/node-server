@@ -1,11 +1,20 @@
 const { Router } = require('express');
 const router = Router();
+const config = require('config');
 const ReportConsumer = require('../consumers/ReportConsumer');
 
 // Logger configuration
 const log4js = require('log4js');
 log4js.configure('./config/log4js-config.json');
 const logger = log4js.getLogger('report');
+
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+    clientId: config.get('kafkaClientIdRequest'),
+    brokers: [config.get('kafkaBroker')]
+});
+
 
 reportHistory = new ReportConsumer().getReportsHistory();
 
@@ -71,7 +80,7 @@ const produceReport = async (id) => {
 
         logger.info(`Request to get report by requestId: ${JSON.stringify(msg)} sended.`);
 
-        const producer = kafka.producer();
+        const producer = kafka.producer({ groupId: 'analysis.consumer' });
 
         await producer.connect();
         await producer.send({
