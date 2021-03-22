@@ -1,7 +1,11 @@
 const { Router } = require('express');
-const logger = require('../config/Logger')('../logs/Request.log');
 const router = Router();
 const config = require('config');
+
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('request');
 
 const { Kafka } = require('kafkajs');
 

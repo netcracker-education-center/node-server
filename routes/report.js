@@ -1,9 +1,13 @@
 const { Router } = require('express');
 const router = Router();
-const logger = require('../config/Logger')('../logs/Report.log');
-const ReportHistory = require('../consumers/ReportConsumer');
+const ReportConsumer = require('../consumers/ReportConsumer');
 
-const reportHistory = new ReportHistory().getReports();
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('report');
+
+reportHistory = new ReportConsumer().getReportsHistory();
 
  /**
   * Get report by reqId

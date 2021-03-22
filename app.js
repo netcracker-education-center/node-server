@@ -1,8 +1,11 @@
 const express = require("express");
 const config = require('config');
-const logger = require('./config/Logger')('./logs/App.log');
 const PORT = config.get('port') || 7071;
 
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('app');
 
 
 const app = express();
