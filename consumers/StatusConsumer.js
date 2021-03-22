@@ -7,7 +7,7 @@ const logger = log4js.getLogger('statusConsumer');
 
 const { Kafka } = require('kafkajs');
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
+    clientId: config.get('kafkaClientIdStatusConsumer'),
     brokers: [config.get('kafkaBroker')]
 });
 
