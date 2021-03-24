@@ -20,11 +20,11 @@ class ReportConsumer {
         this.reportHistory = [];
         this.reportConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
     }
-    
+
     /**
     * Consumer, which get message from topic "reports" and save it to local file
     */
-     async reportConsumer(){
+    async reportConsumer() {
         try {
 
             const consumer = kafka.consumer({ groupId: 'UIGetReports' });
@@ -43,6 +43,12 @@ class ReportConsumer {
                         message: msg,
                         timestamp: message.timestamp
                     });
+
+                    //Delet old reports and save last 5 reports
+                    if (this.reportHistory.length > 5) {
+                        this.reportHistory.splice(0, this.reportHistory.length - 5);
+                    }
+
                 }
             });
         } catch (e) {

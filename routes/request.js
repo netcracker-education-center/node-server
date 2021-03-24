@@ -29,7 +29,7 @@ router.post('/push', async (req, res) => {
             'ftpFiles': {
                 'pathToDir': req.body.pathToDir,
                 'extensionFilter': req.body.ftpExtention,
-                'dataFilter': req.body.ftpDate
+                'dateFilter': req.body.ftpDate
             },
 
             'keywords': req.body.keywords

@@ -24,7 +24,7 @@ class StatusConsumer {
     /**
      * Method which consume status topic
      */
-    async statusConsumer(){
+    async statusConsumer() {
         try {
 
             const consumer = kafka.consumer({ groupId: 'UIRequestStatuses' });
@@ -38,11 +38,20 @@ class StatusConsumer {
             consumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
                     let msg = JSON.parse(message.value.toString());
-                    logger.info('Consumed statuse:' + msg);
+                    logger.info('Consumed statuse:' + JSON.stringify(msg));
+                    
                     this.statusHistory.push({
                         message: msg,
                         timestamp: message.timestamp
                     });
+
+                    //Delete user requestes old statuses from history
+                    this.statusHistory.forEach(element => {
+                        if(JSON.stringify(element.message)===JSON.stringify(msg) && message.timestamp > element.timestamp) {
+                            this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
+                        }
+                    })
+
                 }
             });
         } catch (e) {
