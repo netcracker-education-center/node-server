@@ -1,14 +1,12 @@
 FROM node:alpine
-# Папка приложения
+# App dir
 WORKDIR /app
-# Установка зависимостей
+# Dependency install
 COPY package*.json ./
-RUN npm install
-# Для использования в продакшне
-# RUN npm install --production
-# Копирование файлов проекта
+RUN npm install --production
+# Copy project files
 COPY . .
-# Уведомление о порте, который будет прослушивать работающее приложение
+# Port, which will use docker
 EXPOSE 7071
-# Запуск проекта
+# Project start
 CMD ["npm", "start"]
