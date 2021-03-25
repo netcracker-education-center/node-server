@@ -47,7 +47,7 @@ class StatusConsumer {
 
                     //Delete user requestes old statuses from history
                     this.statusHistory.forEach(element => {
-                        if(JSON.stringify(element.message)===JSON.stringify(msg) && message.timestamp > element.timestamp) {
+                        if(JSON.stringify(element.message.requestId)===JSON.stringify(msg.requestId) && message.timestamp > element.timestamp) {
                             this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
                         }
                     })
