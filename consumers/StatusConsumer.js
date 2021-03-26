@@ -1,10 +1,14 @@
 const config = require('config');
-const { Kafka } = require('kafkajs');
-const logger = require('../config/Logger')('../logs/StatusConsumer.log');
 
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('statusConsumer');
+
+const { Kafka } = require('kafkajs');
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
-    brokers: [config.get('kafkaBroker')]
+    clientId: config.get('kafka.consumers.status'),
+    brokers: [config.get('kafka.broker')]
 });
 
 
@@ -15,10 +19,12 @@ class StatusConsumer {
     constructor() {
         this.statusHistory = [];
         this.statusConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
-
     }
 
-    statusConsumer = async () => {
+    /**
+     * Method which consume status topic
+     */
+    async statusConsumer() {
         try {
 
             const consumer = kafka.consumer({ groupId: 'UIRequestStatuses' });
@@ -30,15 +36,24 @@ class StatusConsumer {
 
             //get each message and save it to statusHistory array
             consumer.run({
-
                 eachMessage: async ({ topic, partition, message }) => {
                     let msg = JSON.parse(message.value.toString());
-                    logger.info('Consumed statuse:' + msg);
+                    logger.info('Consumed statuse:' + JSON.stringify(msg));
 
                     this.statusHistory.push({
                         message: msg,
                         timestamp: message.timestamp
                     });
+
+                    //Delete user requestes old statuses from history
+                    this.statusHistory.forEach(element => {
+                        if (element.message.requestId === msg.requestId &&
+                            message.timestamp > element.timestamp) {
+                                console.log(`${msg.requestId} is true`);
+                            this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
+                        } else console.log(`${msg.requestId} is false`);
+                    })
+
                 }
             });
         } catch (e) {
@@ -50,7 +65,7 @@ class StatusConsumer {
      * 
      * @returns status history from kafka
      */
-    getStatusHistory = () => {
+    getStatusHistory() {
         return this.statusHistory;
     }
 }

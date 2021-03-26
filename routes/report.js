@@ -1,51 +1,52 @@
 const { Router } = require('express');
 const router = Router();
-const logger = require('../config/Logger')('../logs/Report.log');
-const ReportHistory = require('../consumers/ReportConsumer');
+const config = require('config');
+const ReportConsumer = require('../consumers/ReportConsumer');
 
-const reportHistory = new ReportHistory().getReports();
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('report');
 
- /**
-  * Get report by reqId
-  */
- router.post('/get', async (req, res) => {
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+    clientId: config.get('kafka.producers.report'),
+    brokers: [config.get('kafka.broker')]
+});
+
+
+let reportConsumer = new ReportConsumer();
+
+/**
+ * Get report by reqId
+ */
+router.post('/get', async (req, res) => {
 
     let reqId = req.body.requestId;
 
+    let reportHistory = reportConsumer.getReportsHistory();
+
     //If dosn't found any status, return null
-    if (reportHistory === null) {
+    if (repo === null) {
         res.send(null);
     }
-    
+
     //Finding all reports with current reqId
     let reportArray = reportHistory.map(v => {
         if (v.message.requestId === reqId) {
             return v
         }
     });
-    
-    //If DontFind report send req to topic and return -1
+
+    //If Dont Find report send req to topic and return -1
     if (reportArray === null) {
         //Produce req for getting report by reqId
         produceReport(reqId);
         res.send(-1);
     }
-        //Array with users Requestes Id and last index in history
-        let resultReport = reportArray[0];
-
-    //Getting latest reports and delete old reports
-    reportArray.forEach(e => {
-        if (e.timestamp > resultReport.timestamp) {
-            reportArray=e;
-        } else {
-            reportHistory.splice(reportHistory.indexOf(e), 1)
-        }
-    });
-
-    //Delet old reports and save last 5 reports
-    if(reportHistory.length>5) {
-        reportHistory.splice(0, reportHistory.length-5);
-    }
+    //Last report in array
+    let resultReport = reportArray[reportArray.length - 1];
 
     //Return latest report
     res.send(resultReport.message);
@@ -67,7 +68,7 @@ const produceReport = async (id) => {
 
         logger.info(`Request to get report by requestId: ${JSON.stringify(msg)} sended.`);
 
-        const producer = kafka.producer();
+        const producer = kafka.producer({ groupId: 'analysis.consumer' });
 
         await producer.connect();
         await producer.send({

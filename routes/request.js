@@ -1,13 +1,17 @@
 const { Router } = require('express');
-const logger = require('../config/Logger')('../logs/Request.log');
 const router = Router();
 const config = require('config');
+
+// Logger configuration
+const log4js = require('log4js');
+log4js.configure('./config/log4js-config.json');
+const logger = log4js.getLogger('request');
 
 const { Kafka } = require('kafkajs');
 
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientId'),
-    brokers: [config.get('kafkaBroker')]
+    clientId: config.get('kafka.producers.request'),
+    brokers: [config.get('kafka.broker')]
 });
 
 /**
@@ -25,14 +29,14 @@ router.post('/push', async (req, res) => {
             'ftpFiles': {
                 'pathToDir': req.body.pathToDir,
                 'extensionFilter': req.body.ftpExtention,
-                'dataFilter': req.body.ftpDate
+                'dateFilter': req.body.ftpDate
             },
 
             'keywords': req.body.keywords
         }
         logger.info(` Sended message: ${JSON.stringify(msg)}`);
 
-        const producer = kafka.producer();
+        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
         await producer.connect();
         await producer.send({

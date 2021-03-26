@@ -1,5 +1,17 @@
 {
+    "crossOrigin": {
+        "reactUIAddress": "http://206.81.22.187:7070"
+    },
     "port": 7071,
-    "kafkaBroker": "206.81.22.187:9092",
-    "kafkaClientId": "node-server"
+    "kafka": {
+        "broker": "206.81.22.187:9092",
+        "consumers": {
+            "status": "UIStatusConsumer",
+            "report": "UIReportConsumer"
+        },
+        "producers": {
+            "request": "UIRequestProducer",
+            "report": "UIReportProducer"
+        }
+    }
 }

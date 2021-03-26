@@ -1,0 +1,58 @@
+{
+    "appenders": {
+        "consoleAppender": {
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%d - %c:[%p]: %m"
+            }
+        },
+        "appAppender": {
+            "type": "file",
+            "filename": "./logs/App.log"
+        },
+        "reportConsumerAppender": {
+            "type": "file",
+            "filename": "./logs/ReportConsumer.log"
+        },
+        "statusConsumerAppender": {
+            "type": "file",
+            "filename": "./logs/StatusConsumer.log"
+        },
+        "reportAppender": {
+            "type": "file",
+            "filename": "./logs/Report.log"
+        },
+        "RequestAppender": {
+            "type": "file",
+            "filename": "./logs/Request.log"
+        }
+    },
+
+    "categories": {
+        "default": {
+            "appenders": ["consoleAppender"],
+            "level": "debug"
+        },
+        "app": {
+            "appenders": ["appAppender"],
+            "level": "debug"
+        },
+        "statusConsumer": {
+            "appenders": ["statusConsumerAppender"],
+            "level": "debug"
+        },
+        "reportConsumer": {
+            "appenders": ["reportConsumerAppender"],
+            "level": "debug"
+        },
+        "request": {
+            "appenders": ["RequestAppender"],
+            "level": "debug"
+        },
+        "report": {
+            "appenders": ["reportAppender"],
+            "level": "debug"
+        }
+    }
+}
