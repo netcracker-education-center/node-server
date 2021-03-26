@@ -11,8 +11,8 @@ const logger = log4js.getLogger('report');
 const { Kafka } = require('kafkajs');
 
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientIdReport'),
-    brokers: [config.get('kafkaBroker')]
+    clientId: config.get('kafka.producers.report'),
+    brokers: [config.get('kafka.broker')]
 });
 
 

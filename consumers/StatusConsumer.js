@@ -7,8 +7,8 @@ const logger = log4js.getLogger('statusConsumer');
 
 const { Kafka } = require('kafkajs');
 const kafka = new Kafka({
-    clientId: config.get('kafkaClientIdStatusConsumer'),
-    brokers: [config.get('kafkaBroker')]
+    clientId: config.get('kafka.consumers.status'),
+    brokers: [config.get('kafka.broker')]
 });
 
 
@@ -39,7 +39,7 @@ class StatusConsumer {
                 eachMessage: async ({ topic, partition, message }) => {
                     let msg = JSON.parse(message.value.toString());
                     logger.info('Consumed statuse:' + JSON.stringify(msg));
-                    
+
                     this.statusHistory.push({
                         message: msg,
                         timestamp: message.timestamp
@@ -47,9 +47,11 @@ class StatusConsumer {
 
                     //Delete user requestes old statuses from history
                     this.statusHistory.forEach(element => {
-                        if(JSON.stringify(element.message.requestId)===JSON.stringify(msg.requestId) && message.timestamp > element.timestamp) {
+                        if (element.message.requestId === msg.requestId &&
+                            message.timestamp > element.timestamp) {
+                                console.log(`${msg.requestId} is true`);
                             this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
-                        }
+                        } else console.log(`${msg.requestId} is false`);
                     })
 
                 }
