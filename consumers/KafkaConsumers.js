@@ -53,20 +53,18 @@ class KafkaConsumers {
 
                     //Delete user requestes old statuses from history
                     if (msg.status === 'COMPLETED') {
-                        console.log(msg.requestId + ' COMPLETED');
                         this.statusHistory.forEach(element => {
                             if (element.message.requestId === msg.requestId) {
-                                console.log(`deleted COMPLETED msg`);
+                                
                                 this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
-                            } else console.log(`COMPLETED is false`);
+                            }
                         });
                     } else {
                         this.statusHistory.forEach(element => {
                             if (element.message.requestId === msg.requestId &&
                                 message.timestamp >= element.timestamp) {
-                                console.log(`deleted NOT COMPLET msg`);
                                 this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
-                            } else console.log(`NOT COMPLET`);
+                            }
                         });
                     }
                     this.statusHistory.push({
