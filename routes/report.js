@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const config = require('config');
-const ReportConsumer = require('../consumers/ReportConsumer');
+const KafkaConsumers = require('../consumers/KafkaConsumers');
 
 // Logger configuration
 const log4js = require('log4js');
@@ -16,40 +16,38 @@ const kafka = new Kafka({
 });
 
 
-let reportConsumer = new ReportConsumer();
+let reportConsumer = KafkaConsumers;
 
 /**
  * Get report by reqId
  */
 router.post('/get', async (req, res) => {
-
     let reqId = req.body.requestId;
+    try {
 
-    let reportHistory = reportConsumer.getReportsHistory();
 
-    //If dosn't found any status, return null
-    if (repo === null) {
-        res.send(null);
-    }
+        let reportHistory = reportConsumer.getReportsHistory();
 
-    //Finding all reports with current reqId
-    let reportArray = reportHistory.map(v => {
-        if (v.message.requestId === reqId) {
-            return v
+        if (Array.isArray(reportHistory) && reportHistory.length) {
+
+            //Finding all reports with current reqId
+            let reportArray = reportHistory.map(v => {
+                if (v.message.requestId === reqId) {
+                    return v
+                }
+            });
+
+            let resultReport = reportArray[reportArray.length - 1];
+            res.send(resultReport.message);
+        } else {
+            //Produce req for getting report by reqId
+            await produceReport(reqId);
+            res.send('null');
         }
-    });
-
-    //If Dont Find report send req to topic and return -1
-    if (reportArray === null) {
-        //Produce req for getting report by reqId
-        produceReport(reqId);
-        res.send(-1);
+    } catch (e) {
+        await produceReport(reqId);
+        res.send('null');
     }
-    //Last report in array
-    let resultReport = reportArray[reportArray.length - 1];
-
-    //Return latest report
-    res.send(resultReport.message);
 })
 
 /**
@@ -78,11 +76,10 @@ const produceReport = async (id) => {
             ]
         });
         await producer.disconnect();
-        return res.status(200).json({ message: 'Message, sended!' });
+        return 200;
 
     } catch (e) {
         logger.error(`Enything while sending request went wrong ${e}`);
-        res.status(500).json({ e });
     }
 }
 

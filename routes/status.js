@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const StatusConsumer = require('../consumers/StatusConsumer');
+const KafkaConsumers = require('../consumers/KafkaConsumers');
 const router = Router();
 
-let statusConsumer = new StatusConsumer();
+let statusConsumer = KafkaConsumers;
 /**
  * Return latest status of all user's requestes
  */
