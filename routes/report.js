@@ -1,4 +1,4 @@
-const { Router } = require('express');
+const { Router, request } = require('express');
 const router = Router();
 const config = require('config');
 const KafkaConsumers = require('../consumers/KafkaConsumers');
@@ -23,8 +23,9 @@ let reportConsumer = KafkaConsumers;
  */
 router.post('/get', async (req, res) => {
     let reqId = req.body.requestId;
-    try {
+    let time = req.body.time;
 
+    try {
 
         let reportHistory = reportConsumer.getReportsHistory();
 
@@ -40,12 +41,16 @@ router.post('/get', async (req, res) => {
             let resultReport = reportArray[reportArray.length - 1];
             res.send(resultReport.message);
         } else {
-            //Produce req for getting report by reqId
-            await produceReport(reqId);
-            res.send('null');
+            if (time === 'first') {
+
+                console.log('mesage at ' + time + ' time')
+                //Produce req for getting report by reqId
+                // await produceReport(reqId);
+                res.send('null');
+            }
         }
     } catch (e) {
-        await produceReport(reqId);
+        // await produceReport(reqId);
         res.send('null');
     }
 })
@@ -82,5 +87,36 @@ const produceReport = async (id) => {
         logger.error(`Enything while sending request went wrong ${e}`);
     }
 }
+
+//------------------------------------------------------
+// //WebSocket
+// const WebSocket = require('ws');
+// function setupWebSocket(server) {
+//     //ws instance
+//     const wss = new WebSocket.Server({noServer: true});
+
+//     //handle upgrade of the request
+//     server.on("upgrade", function upgrade(request, socket, head){
+//         try{
+//             // authentication and some other steps will come here
+//             // we can choose wheather to upgrade or not
+
+//             wss.handleUpgrade(request,socket, head, function done(ws){
+//                 wss.emit("connection", ws, request);
+//             });
+//         } catch (err) {
+//             console.log('upgrade exception', err);
+//             socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+//             socket.destroy();
+//             return;
+//         }
+//     });
+//     // what to do after connection established
+//     wss.on('connection', (ctx)=>{
+        
+//     })
+// }
+
+//------------------------------------------------------
 
 module.exports = router;
