@@ -33,10 +33,9 @@ router.post('/push', async (req, res) => {
                 'dateFilter': req.body.ftpDate
             },
 
-            'confData': {
-                'confIssuesDate': req.body.confIssuesDate,
-                'confCQLRequest': req.body.confCQLRequest,
-                'confIssuesStatus': req.body.confIssuesStatus
+            'confPages': {
+                'confPagesDate': req.body.confPagesDate,
+                'cql': req.body.cql
             },
             'status': 'COMPLETED',
 

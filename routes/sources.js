@@ -62,7 +62,7 @@ router.post('/push', async (req, res) => {
             type: action,
             source,
             credentials: {
-                url: credentials.id,
+                id: credentials.id,
                 password: credentials.password,
                 login: credentials.login,
             }
@@ -72,17 +72,17 @@ router.post('/push', async (req, res) => {
 
         KafkaConsumers.setSource(msg);
 
-        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
+        // const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
-        await producer.connect();
-        await producer.send({
-            topic,
-            messages: [
-                { value: JSON.stringify(msg) },
-            ]
-        });
+        // await producer.connect();
+        // await producer.send({
+        //     topic,
+        //     messages: [
+        //         { value: JSON.stringify(msg) },
+        //     ]
+        // });
 
-        await producer.disconnect();
+        // await producer.disconnect();
 
         res.send('Message sended');
     } else if (source === 'FTP') {
@@ -98,6 +98,13 @@ router.post('/push', async (req, res) => {
         KafkaConsumers.setSource(msg);
 
         res.send('Message sended');
+    } else if (source === 'CONFLUENCE'){
+        let credentials = req.body.confSource;
+        let msg = {
+            action,
+            source,
+            credentials
+        }
     }
 });
 
