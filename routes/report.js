@@ -39,15 +39,25 @@ router.post('/get', async (req, res) => {
             });
 
             let resultReport = reportArray[reportArray.length - 1];
-            res.send(resultReport.message);
-        } else {
+            if (!!resultReport) {
+                res.send(resultReport.message);
+            } else {
+                if (time === 'first') {
+
+                    console.log('mesage at ' + time + ' time')
+                    // Produce req for getting report by reqId
+                    // await produceReport(reqId);
+                    res.send('null');
+                }
+            }
             if (time === 'first') {
 
                 console.log('mesage at ' + time + ' time')
-                //Produce req for getting report by reqId
+                // Produce req for getting report by reqId
                 // await produceReport(reqId);
                 res.send('null');
             }
+        } else {
         }
     } catch (e) {
         // await produceReport(reqId);
@@ -113,7 +123,7 @@ const produceReport = async (id) => {
 //     });
 //     // what to do after connection established
 //     wss.on('connection', (ctx)=>{
-        
+
 //     })
 // }
 

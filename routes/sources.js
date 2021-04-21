@@ -48,26 +48,22 @@ router.post('/push', async (req, res) => {
 //     await producer.disconnect();
 // }
 
-    let topic = 'listening.ui.admin';
-    let source = req.body.source;
-    let action = req.body.action;
-    let id = req.body.id;
+let topic = 'listening.ui.admin';
+let action = req.body.action.toLowerCase();
 
-    if (action === 'remove') {
-        console.log('we delete: ' + id);
-        KafkaConsumers.deleteSource(id);
-    } else if (source === 'JIRA') {
-        let credentials = req.body.jiraSource;
+if (action === 'remove') {
+    let id = req.body.id;
+    console.log('we delete: ' + id);
+    KafkaConsumers.deleteSource(id);
+} else {
+        let source = req.body.source.toLowerCase();
+        let credentials = req.body.credentials;
         let msg = {
             type: action,
             source,
-            credentials: {
-                id: credentials.id,
-                password: credentials.password,
-                login: credentials.login,
-            }
+            credentials
         }
-        console.log(action + ' JIRA source');
+        console.log(`${action} ${source} source`);
         console.log(JSON.stringify(msg));
 
         KafkaConsumers.setSource(msg);
@@ -85,26 +81,6 @@ router.post('/push', async (req, res) => {
         // await producer.disconnect();
 
         res.send('Message sended');
-    } else if (source === 'FTP') {
-        let credentials = req.body.ftpSource;
-        let msg = {
-            action,
-            source,
-            credentials
-        }
-        console.log(action + ' FTP source');
-        console.log(JSON.stringify(msg));
-
-        KafkaConsumers.setSource(msg);
-
-        res.send('Message sended');
-    } else if (source === 'CONFLUENCE'){
-        let credentials = req.body.confSource;
-        let msg = {
-            action,
-            source,
-            credentials
-        }
     }
 });
 

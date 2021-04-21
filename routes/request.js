@@ -41,7 +41,7 @@ router.post('/push', async (req, res) => {
 
             'keywords': req.body.keywords,
             'userId': req.body.userId,
-            'selectedSources': req.body.selectedSources
+            'selectedSources': JSON.parse(JSON.stringify(req.body.selectedSources).toLowerCase())
 
         }
         console.log(` Sended message: ${JSON.stringify(msg)}`);
