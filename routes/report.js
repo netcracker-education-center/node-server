@@ -44,23 +44,22 @@ router.post('/get', async (req, res) => {
             } else {
                 if (time === 'first') {
 
-                    console.log('mesage at ' + time + ' time')
+                    logger.info('mesage at ' + time + ' time')
                     // Produce req for getting report by reqId
-                    // await produceReport(reqId);
+                    await produceReport(reqId);
                     res.send('null');
                 }
             }
             if (time === 'first') {
 
-                console.log('mesage at ' + time + ' time')
+                logger.info('mesage at ' + time + ' time')
                 // Produce req for getting report by reqId
-                // await produceReport(reqId);
+                await produceReport(reqId);
                 res.send('null');
             }
         } else {
         }
     } catch (e) {
-        // await produceReport(reqId);
         res.send('null');
     }
 })

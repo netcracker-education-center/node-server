@@ -44,28 +44,22 @@ router.post('/push', async (req, res) => {
             'selectedSources': JSON.parse(JSON.stringify(req.body.selectedSources).toLowerCase())
 
         }
-        console.log(` Sended message: ${JSON.stringify(msg)}`);
+        logger.info(` Sended search request: ${JSON.stringify(msg)}`);
 
-        KafkaConsumers.setStatus({
-            message: msg,
-            timestamp: Date.now
-        })
+        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
-        // const producer = kafka.producer({ groupId: 'dataminer.consumer' });
-
-        // await producer.connect();
-        // await producer.send({
-        //     topic: 'TEST-listening.ui.request',
-        //     messages: [
-        //         { value: JSON.stringify(msg) },
-        //     ]
-        // });
-
-        // await producer.disconnect();
+        await producer.connect();
+        await producer.send({
+            topic: 'listening.ui.request',
+            messages: [
+                { value: JSON.stringify(msg) },
+            ]
+        });
+        await producer.disconnect();
 
         return res.status(200).json({ message: 'Message, sended!' })
     } catch (e) {
-        console.log(`Enything went wrong while sending request. Current exception: ${e}`);
+        logger.info(`Enything went wrong while sending request. Current exception: ${e}`);
         res.status(500).json(`Enything went wrong while sending request. Current exception: ${e}`);
     }
 });

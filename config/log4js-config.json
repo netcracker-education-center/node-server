@@ -23,6 +23,10 @@
             "type": "file",
             "filename": "./logs/Report.log"
         },
+        "sourceAppender": {
+            "type": "file",
+            "filename": "./logs/Source.log"
+        },
         "RequestAppender": {
             "type": "file",
             "filename": "./logs/Request.log"
@@ -48,6 +52,10 @@
         },
         "request": {
             "appenders": ["RequestAppender"],
+            "level": "debug"
+        },
+        "source": {
+            "appenders": ["sourceAppender"],
             "level": "debug"
         },
         "report": {

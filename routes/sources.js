@@ -6,7 +6,7 @@ const KafkaConsumers = require('../consumers/KafkaConsumers');
 // Logger configuration
 const log4js = require('log4js');
 log4js.configure('./config/log4js-config.json');
-const logger = log4js.getLogger('report');
+const logger = log4js.getLogger('sources');
 
 const { Kafka } = require('kafkajs');
 
@@ -21,7 +21,7 @@ const kafka = new Kafka({
  */
 router.post('/get', async (req, res) => {
     let sourcesHistory = KafkaConsumers.getSourceHistory();
-    console.log('get request');
+    logger.info('SOURCES: ' + JSON.stringify(sourcesHistory));
     res.send(sourcesHistory);
 });
 
@@ -30,32 +30,27 @@ router.post('/get', async (req, res) => {
  */
 router.post('/push', async (req, res) => {
 
-// let data = {
-//     type: "get_all"
-// }
+    let topic = 'listening.ui.admin';
+    let action = req.body.action.toLowerCase();
 
-// if(data.type==='get_all'){
-//     const producer = kafka.producer({ groupId: 'dataminer.consumer' });
+    if (action === 'remove') {
+        let id = req.body.id;
+        let msg = {
+            type: action,
+            id
+        }
 
-//     await producer.connect();
-//     await producer.send({
-//         topic:'listening.ui.admin',
-//         messages: [
-//             { value: JSON.stringify(data) },
-//         ]
-//     });
+        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
+        await producer.connect();
+        await producer.send({
+            topic,
+            messages: [
+                { value: JSON.stringify(msg) },
+            ]
+        });
+        await producer.disconnect();
 
-//     await producer.disconnect();
-// }
-
-let topic = 'listening.ui.admin';
-let action = req.body.action.toLowerCase();
-
-if (action === 'remove') {
-    let id = req.body.id;
-    console.log('we delete: ' + id);
-    KafkaConsumers.deleteSource(id);
-} else {
+    } else {
         let source = req.body.source.toLowerCase();
         let credentials = req.body.credentials;
         let msg = {
@@ -63,58 +58,24 @@ if (action === 'remove') {
             source,
             credentials
         }
-        console.log(`${action} ${source} source`);
-        console.log(JSON.stringify(msg));
+        
+        logger.info(`${action} ${source} source`);
+        logger.info('Get source request: ' + JSON.stringify(msg));
 
-        KafkaConsumers.setSource(msg);
-
-        // const producer = kafka.producer({ groupId: 'dataminer.consumer' });
-
-        // await producer.connect();
-        // await producer.send({
-        //     topic,
-        //     messages: [
-        //         { value: JSON.stringify(msg) },
-        //     ]
-        // });
-
-        // await producer.disconnect();
-
-        res.send('Message sended');
-    }
-});
-
-/**
- * Produce to kafka topic request for getting new Report
- */
-const produceReport = async (id) => {
-    try {
-
-        //topic name
-        let topic = 'get.report';
-
-        //message for topic
-        let msg = {
-            requestId: id
-        };
-
-        logger.info(`Request to get report by requestId: ${JSON.stringify(msg)} sended.`);
-
-        const producer = kafka.producer({ groupId: 'analysis.consumer' });
+        const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
         await producer.connect();
         await producer.send({
-            topic: topic,
+            topic,
             messages: [
                 { value: JSON.stringify(msg) },
             ]
         });
-        await producer.disconnect();
-        return 200;
 
-    } catch (e) {
-        logger.error(`Enything while sending request went wrong ${e}`);
+        await producer.disconnect();
+
+        res.send('Message sended');
     }
-}
+});
 
 module.exports = router;
