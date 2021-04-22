@@ -59,7 +59,7 @@ router.post('/push', async (req, res) => {
 
         return res.status(200).json({ message: 'Message, sended!' })
     } catch (e) {
-        logger.info(`Enything went wrong while sending request. Current exception: ${e}`);
+        logger.error(`Enything went wrong while sending request. Current exception: ${e}`);
         res.status(500).json(`Enything went wrong while sending request. Current exception: ${e}`);
     }
 });
