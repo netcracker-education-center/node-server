@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const config = require('config');
+const KafkaConsumers = require('../consumers/KafkaConsumers');
 
 // Logger configuration
 const log4js = require('log4js');
@@ -32,9 +33,18 @@ router.post('/push', async (req, res) => {
                 'dateFilter': req.body.ftpDate
             },
 
-            'keywords': req.body.keywords
+            'confPages': {
+                'confPagesDate': req.body.confPagesDate,
+                'cql': req.body.cql
+            },
+            'status': 'COMPLETED',
+
+            'keywords': req.body.keywords,
+            'userId': req.body.userId,
+            'selectedSources': JSON.parse(JSON.stringify(req.body.selectedSources).toLowerCase())
+
         }
-        logger.info(` Sended message: ${JSON.stringify(msg)}`);
+        logger.info(` Sended search request: ${JSON.stringify(msg)}`);
 
         const producer = kafka.producer({ groupId: 'dataminer.consumer' });
 
@@ -45,7 +55,6 @@ router.post('/push', async (req, res) => {
                 { value: JSON.stringify(msg) },
             ]
         });
-
         await producer.disconnect();
 
         return res.status(200).json({ message: 'Message, sended!' })

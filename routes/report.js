@@ -1,4 +1,4 @@
-const { Router } = require('express');
+const { Router, request } = require('express');
 const router = Router();
 const config = require('config');
 const KafkaConsumers = require('../consumers/KafkaConsumers');
@@ -23,8 +23,9 @@ let reportConsumer = KafkaConsumers;
  */
 router.post('/get', async (req, res) => {
     let reqId = req.body.requestId;
-    try {
+    let time = req.body.time;
 
+    try {
 
         let reportHistory = reportConsumer.getReportsHistory();
 
@@ -38,14 +39,27 @@ router.post('/get', async (req, res) => {
             });
 
             let resultReport = reportArray[reportArray.length - 1];
-            res.send(resultReport.message);
+            if (!!resultReport) {
+                res.send(resultReport.message);
+            } else {
+                if (time === 'first') {
+
+                    logger.info('mesage at ' + time + ' time')
+                    // Produce req for getting report by reqId
+                    await produceReport(reqId);
+                    res.send('null');
+                }
+            }
+            if (time === 'first') {
+
+                logger.info('mesage at ' + time + ' time')
+                // Produce req for getting report by reqId
+                await produceReport(reqId);
+                res.send('null');
+            }
         } else {
-            //Produce req for getting report by reqId
-            await produceReport(reqId);
-            res.send('null');
         }
     } catch (e) {
-        await produceReport(reqId);
         res.send('null');
     }
 })

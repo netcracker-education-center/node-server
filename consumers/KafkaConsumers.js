@@ -4,8 +4,6 @@ const config = require('config');
 const log4js = require('log4js');
 log4js.configure('./config/log4js-config.json');
 const loggerS = log4js.getLogger('statusConsumer');
-
-// Logger configuration
 const loggerR = log4js.getLogger('reportConsumer');
 
 
@@ -21,13 +19,17 @@ const kafka = new Kafka({
  */
 class KafkaConsumers {
     constructor() {
-        //report consumer run
+        // Report consumer run
         this.reportHistory = [];
-        this.reportConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
- 
-        //status consumer run
+        this.reportConsumer().catch(e => console.error(`[example/consumer] ${e.message}`, e));
+        
+        // Sources consumer run
+        this.sourcesHistory = [];
+        
+        // Status consumer run
         this.statusHistory = [];
         this.statusConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
+        this.produceReport();
     }
 
     /**
@@ -35,7 +37,6 @@ class KafkaConsumers {
      */
     async statusConsumer() {
         try {
-
             const consumer = kafka.consumer({ groupId: 'UIRequestStatuses' });
             let topic = 'analysis-topic';
 
@@ -49,13 +50,13 @@ class KafkaConsumers {
                     let msg = JSON.parse(message.value.toString());
                     loggerS.info('Consumed statuse:' + JSON.stringify(msg));
 
-                    
+
 
                     //Delete user requestes old statuses from history
                     if (msg.status === 'COMPLETED') {
                         this.statusHistory.forEach(element => {
                             if (element.message.requestId === msg.requestId) {
-                                
+
                                 this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
                             }
                         });
@@ -78,33 +79,63 @@ class KafkaConsumers {
         }
     }
 
+    async produceReport() {
+        try {
+            let data = {
+                type: "get_all"
+            }
+
+            const producer = kafka.producer({ groupId: 'dataminer.consumer' });
+
+            await producer.connect();
+            await producer.send({
+                topic: 'listening.ui.admin',
+                messages: [
+                    { value: JSON.stringify(data) },
+                ]
+            });
+            await producer.disconnect();
+
+        } catch (e) {
+            logger.error(`Enything while sending request went wrong ${e}`);
+        }
+    }
+
+    /**
+     * Consume reports from kafka
+     */
     async reportConsumer() {
         try {
 
-            const consumer = kafka.consumer({ groupId: 'UIGetReport' });
+            const consumer = kafka.consumer({ groupId: 'UIGetReportAndSources' });
             let topic = 'reports';
 
             await consumer.connect();
             loggerR.info('connected to: ' + topic);
-            await consumer.subscribe({ topic, fromBeginning: false });
+            await consumer.subscribe({ topic: 'reports', fromBeginning: true });
 
             //get each message and save it to reportHistory array
             consumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
                     let msg = JSON.parse(message.value.toString());
                     loggerR.info('Consumed message: ' + msg);
-                    this.reportHistory.push({
-                        message: msg,
-                        timestamp: message.timestamp
-                    });
 
-                    //Delet old reports and save last 5 reports
-                    if (this.reportHistory.length > 5) {
-                        this.reportHistory.splice(0, this.reportHistory.length - 5);
+                    if (Array.isArray(msg) && msg.length) {
+                        this.sourcesHistory = msg;
+                    } else {
+                        this.reportHistory.push({
+                            message: msg,
+                            timestamp: message.timestamp
+                        });
+
+                        //Delet old reports and save last 5 reports
+                        if (this.reportHistory.length > 5) {
+                            this.reportHistory.splice(0, this.reportHistory.length - 5);
+                        }
                     }
-
                 }
             });
+
         } catch (e) {
             loggerR.error('Error while consuming reports. Message: ' + e);
         }
@@ -124,6 +155,31 @@ class KafkaConsumers {
      */
     getStatusHistory() {
         return this.statusHistory;
+    }
+
+    /**
+     * 
+     * @returns source history
+     */
+    getSourceHistory() {
+        return this.sourcesHistory;
+    }
+
+    setStatus(status) {
+        this.statusHistory.push(status);
+    }
+
+    setSource(source) {
+        this.sourcesHistory.push(source);
+    }
+
+    deleteSource(id) {
+        let source = this.sourcesHistory.map(v => {
+            if (v.credentials.id === id) {
+                return v
+            }
+        });
+        this.sourcesHistory.splice(this.sourcesHistory.indexOf(source[0]), 1);
     }
 }
 
