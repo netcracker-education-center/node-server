@@ -51,7 +51,7 @@ router.post('/push', async (req, res) => {
         await producer.disconnect();
 
     } else {
-        let source = req.body.source.toLowerCase();
+        let source = req.body.source.toUpperCase();
         let credentials = req.body.credentials;
         let msg = {
             type: action,
