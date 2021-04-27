@@ -35,9 +35,18 @@ router.post('/push', async (req, res) => {
 
     if (action === 'remove') {
         let id = req.body.id;
+        let sourceType = req.body.sourceType
         let msg = {
             type: action,
-            id
+            source: sourceType,
+            credentials:{
+                url: id,
+                server: id,
+                port: '',
+                login: '',
+                password: '',
+                token:''
+            }
         }
 
         const producer = kafka.producer({ groupId: 'dataminer.consumer' });
