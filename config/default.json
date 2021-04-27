@@ -1,6 +1,6 @@
 {
     "crossOrigin": {
-        "reactUIAddress": "http://206.81.22.187:7070"
+        "reactUIAddress": "https://netcracker-collect-and-search.tk"
     },
     "port": 7071,
     "kafka": {
