@@ -29,36 +29,57 @@ router.post('/get', async (req, res) => {
 
         let reportHistory = reportConsumer.getReportsHistory();
 
-        if (Array.isArray(reportHistory) && reportHistory.length) {
 
-            //Finding all reports with current reqId
-            let reportArray = reportHistory.map(v => {
-                if (v.message.requestId === reqId) {
-                    return v
-                }
-            });
+        if (time === 'first') {
+            if (Array.isArray(reportHistory) && reportHistory.length) {
 
-            let resultReport = reportArray[reportArray.length - 1];
-            if (!!resultReport) {
-                res.send(resultReport.message);
-            } else {
-                if (time === 'first') {
+                //Finding all reports with current reqId
+                let reportArray = reportHistory.map(v => {
+                    if (v.message.requestId === reqId) {
+                        return v
+                    }
+                });
 
+                let resultReport = reportArray[reportArray.length - 1];
+                if (!!resultReport) {
+                    res.send(resultReport.message);
+                    return null;
+
+                } else if (time === 'first') {
                     logger.info('mesage at ' + time + ' time')
                     // Produce req for getting report by reqId
                     await produceReport(reqId);
                     res.send('null');
+                    return null;
+
                 }
             }
-            if (time === 'first') {
+            logger.info('mesage at ' + time + ' time')
+            // Produce req for getting report by reqId
+            await produceReport(reqId);
+            res.send('null');
+            return null;
+        } else if (time ==='second') {
+            if (Array.isArray(reportHistory) && reportHistory.length) {
 
-                logger.info('mesage at ' + time + ' time')
-                // Produce req for getting report by reqId
-                await produceReport(reqId);
-                res.send('null');
+                //Finding all reports with current reqId
+                let reportArray = reportHistory.map(v => {
+                    if (v.message.requestId === reqId) {
+                        return v
+                    }
+                });
+
+                let resultReport = reportArray[reportArray.length - 1];
+                if (!!resultReport) {
+                    res.send(resultReport.message);
+                    return null;
+                } else {
+                    res.send('null');
+                    return null;
+                }
             }
-        } else {
         }
+
     } catch (e) {
         res.send('null');
     }
