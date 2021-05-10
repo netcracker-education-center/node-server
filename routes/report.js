@@ -30,53 +30,38 @@ router.post('/get', async (req, res) => {
         let reportHistory = reportConsumer.getReportsHistory();
 
 
+        //Finding all reports with current reqId
+        let reportArray = reportHistory.filter(v => {
+            return v.message.requestId === reqId;
+        });
+
         if (time === 'first') {
-            if (Array.isArray(reportHistory) && reportHistory.length) {
-
-                //Finding all reports with current reqId
-                let reportArray = reportHistory.map(v => {
-                    if (v.message.requestId === reqId) {
-                        return v
-                    }
-                });
+            if (Array.isArray(reportArray) && reportArray.length) {
 
                 let resultReport = reportArray[reportArray.length - 1];
-                if (!!resultReport) {
-                    res.send(resultReport.message);
-                    return null;
+                res.send(resultReport.message);
 
-                } else if (time === 'first') {
-                    logger.info('mesage at ' + time + ' time')
-                    // Produce req for getting report by reqId
-                    await produceReport(reqId);
-                    res.send('null');
-                    return null;
+            } else {
+                logger.info('mesage at ' + time + ' time')
+                // Produce req for getting report by reqId
+                await produceReport(reqId);
+                res.send('null');
+                // return null;
 
-                }
             }
-            logger.info('mesage at ' + time + ' time')
-            // Produce req for getting report by reqId
-            await produceReport(reqId);
-            res.send('null');
-            return null;
-        } else if (time ==='second') {
-            if (Array.isArray(reportHistory) && reportHistory.length) {
+        } else if (time === 'second') {
 
-                //Finding all reports with current reqId
-                let reportArray = reportHistory.map(v => {
-                    if (v.message.requestId === reqId) {
-                        return v
-                    }
-                });
+            if (Array.isArray(reportArray) && reportArray.length) {
 
                 let resultReport = reportArray[reportArray.length - 1];
-                if (!!resultReport) {
-                    res.send(resultReport.message);
-                    return null;
-                } else {
-                    res.send('null');
-                    return null;
-                }
+                res.send(resultReport.message);
+
+            } else {
+                logger.info('mesage at ' + time + ' time')
+                // Produce req for getting report by reqId
+                // await produceReport(reqId);
+                res.send('null');
+                // return null;
             }
         }
 
