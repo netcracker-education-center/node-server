@@ -29,6 +29,7 @@ router.post('/get', async (req, res) => {
 
         let reportHistory = reportConsumer.getReportsHistory();
 
+
         //Finding all reports with current reqId
         let reportArray = reportHistory.filter(v => {
             return v.message.requestId === reqId;
@@ -61,10 +62,9 @@ router.post('/get', async (req, res) => {
                 // await produceReport(reqId);
                 res.send('null');
                 // return null;
-
-
             }
         }
+
     } catch (e) {
         res.send('null');
     }
