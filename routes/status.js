@@ -13,8 +13,16 @@ router.post('/get', async (req, res) => {
         res.send(null);
     }
 
+    let userId = req.body.userId;
+    console.log(userId);
+
+    let statuses = [];
+    statuses = KafkaConsumers.getStatusHistory().filter((v)=>{
+        return v.message.userId===userId;
+    })
+
     //Return latest statuses
-    res.send(statusConsumer.getStatusHistory());
+    res.send(statuses);
 });
 
 

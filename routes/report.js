@@ -29,35 +29,41 @@ router.post('/get', async (req, res) => {
 
         let reportHistory = reportConsumer.getReportsHistory();
 
-        if (Array.isArray(reportHistory) && reportHistory.length) {
+        //Finding all reports with current reqId
+        let reportArray = reportHistory.filter(v => {
+            return v.message.requestId === reqId;
+        });
 
-            //Finding all reports with current reqId
-            let reportArray = reportHistory.map(v => {
-                if (v.message.requestId === reqId) {
-                    return v
-                }
-            });
+        if (time === 'first') {
+            if (Array.isArray(reportArray) && reportArray.length) {
 
-            let resultReport = reportArray[reportArray.length - 1];
-            if (!!resultReport) {
+                let resultReport = reportArray[reportArray.length - 1];
                 res.send(resultReport.message);
+
             } else {
-                if (time === 'first') {
-
-                    logger.info('mesage at ' + time + ' time')
-                    // Produce req for getting report by reqId
-                    await produceReport(reqId);
-                    res.send('null');
-                }
-            }
-            if (time === 'first') {
-
                 logger.info('mesage at ' + time + ' time')
                 // Produce req for getting report by reqId
                 await produceReport(reqId);
                 res.send('null');
+                // return null;
+
             }
-        } else {
+        } else if (time === 'second') {
+
+            if (Array.isArray(reportArray) && reportArray.length) {
+
+                let resultReport = reportArray[reportArray.length - 1];
+                res.send(resultReport.message);
+
+            } else {
+                logger.info('mesage at ' + time + ' time')
+                // Produce req for getting report by reqId
+                // await produceReport(reqId);
+                res.send('null');
+                // return null;
+
+
+            }
         }
     } catch (e) {
         res.send('null');
