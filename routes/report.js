@@ -32,16 +32,18 @@ router.post('/get', async (req, res) => {
 
         //Finding all reports with current reqId
         let reportArray = reportHistory.filter(v => {
-            return v.message.requestId === reqId;
+            return v.requestId === reqId;
         });
 
         if (time === 'first') {
+            // If we find in cash return the report
             if (Array.isArray(reportArray) && reportArray.length) {
 
                 let resultReport = reportArray[reportArray.length - 1];
-                res.send(resultReport.message);
+                res.send(resultReport);
 
             } else {
+                // If dont find we produce it to kafka topic
                 logger.info('mesage at ' + time + ' time')
                 // Produce req for getting report by reqId
                 await produceReport(reqId);
@@ -54,7 +56,7 @@ router.post('/get', async (req, res) => {
             if (Array.isArray(reportArray) && reportArray.length) {
 
                 let resultReport = reportArray[reportArray.length - 1];
-                res.send(resultReport.message);
+                res.send(resultReport);
 
             } else {
                 logger.info('mesage at ' + time + ' time')

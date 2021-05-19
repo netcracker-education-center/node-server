@@ -19,14 +19,14 @@ const kafka = new Kafka({
  */
 class KafkaConsumers {
     constructor() {
-        // Report consumer run
+        // Report consumer cache
         this.reportHistory = [];
         this.reportConsumer().catch(e => console.error(`[example/consumer] ${e.message}`, e));
         
-        // Sources consumer run
+        // Sources consumer cache
         this.sourcesHistory = [];
         
-        // Status consumer run
+        // Status consumer cache
         this.statusHistory = [];
         this.statusConsumer().catch(e => logger.error(`[example/consumer] ${e.message}`, e));
         this.produceReport();
@@ -55,23 +55,20 @@ class KafkaConsumers {
                     //Delete user requestes old statuses from history
                     if (msg.status === 'COMPLETED') {
                         this.statusHistory.forEach(element => {
-                            if (element.message.requestId === msg.requestId) {
+                            if (element.requestId === msg.requestId) {
 
                                 this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
                             }
                         });
                     } else {
                         this.statusHistory.forEach(element => {
-                            if (element.message.requestId === msg.requestId &&
+                            if (element.requestId === msg.requestId &&
                                 message.timestamp >= element.timestamp) {
                                 this.statusHistory.splice(this.statusHistory.indexOf(element), 1)
                             }
                         });
                     }
-                    this.statusHistory.push({
-                        message: msg,
-                        timestamp: message.timestamp
-                    });
+                    this.statusHistory.push(msg);
                 }
             });
         } catch (e) {
@@ -120,17 +117,17 @@ class KafkaConsumers {
                     let msg = JSON.parse(message.value.toString());
                     loggerR.info('Consumed message: ' + msg);
 
+                    // If it is sources, save to source cache
                     if (Array.isArray(msg) && msg.length) {
+                        console.log('his array');
                         this.sourcesHistory = msg;
                     } else {
-                        this.reportHistory.push({
-                            message: msg,
-                            timestamp: message.timestamp
-                        });
+                        console.log('pushing report to cache');
+                        this.reportHistory.push(msg);
 
                         //Delet old reports and save last 5 reports
-                        if (this.reportHistory.length > 5) {
-                            this.reportHistory.splice(0, this.reportHistory.length - 5);
+                        if (this.reportHistory.length > 100) {
+                            this.reportHistory.splice(0, 1);
                         }
                     }
                 }
@@ -165,7 +162,7 @@ class KafkaConsumers {
         return this.sourcesHistory;
     }
 
-    setStatus(status) {
+    addStatus(status) {
         this.statusHistory.push(status);
     }
 
