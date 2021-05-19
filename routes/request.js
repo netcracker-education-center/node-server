@@ -34,7 +34,7 @@ router.post('/push', async (req, res) => {
                 status: 'RESTORED',
                 keywords: cachedReport.keywords,
                 date: cachedReport.date,
-                userId: cachedReport.userId
+                userId: req.body.userId
             }
 
             KafkaConsumers.addStatus(status);
