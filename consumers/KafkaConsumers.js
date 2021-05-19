@@ -119,10 +119,8 @@ class KafkaConsumers {
 
                     // If it is sources, save to source cache
                     if (Array.isArray(msg) && msg.length) {
-                        console.log('his array');
                         this.sourcesHistory = msg;
                     } else {
-                        console.log('pushing report to cache');
                         this.reportHistory.push(msg);
 
                         //Delet old reports and save last 5 reports
