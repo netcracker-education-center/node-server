@@ -85,10 +85,9 @@ router.post('/push', async (req, res) => {
 });
 
 /**
- * Одна из причин возникновения неполадок мб здесь в ифе
  * @param {*} keywords 
  * @param {*} sources 
- * @returns 
+ * @returns true if we find report with current keywords and sources in cache
  */
 const findInCache = (keywords, sources) => {
     let founded = false;
@@ -104,10 +103,9 @@ const findInCache = (keywords, sources) => {
 }
 
 /**
- * Может быть метод не нужен
  * @param {*} keywords 
  * @param {*} sources 
- * @returns 
+ * @returns report from cache
  */
 const getReportFromCache = (keywords, sources) => {
     let report = false;
