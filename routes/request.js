@@ -20,6 +20,26 @@ const kafka = new Kafka({
  */
 router.post('/push', async (req, res) => {
     try {
+        let selectedSources = JSON.parse(JSON.stringify(req.body.selectedSources).toLowerCase());
+        let sources = selectedSources.map(v => {
+            return v.id;
+        })
+        if (findInCache(req.body.keywords, sources)) {
+            console.log('RESTORING');
+            let cachedReport = getReportFromCache(req.body.keywords, sources);
+            console.log(JSON.stringify(cachedReport));
+
+            let status = {
+                requestId: cachedReport.requestId,
+                status: 'RESTORED',
+                keywords: cachedReport.keywords,
+                date: cachedReport.date,
+                userId: cachedReport.userId
+            }
+
+            KafkaConsumers.addStatus(status);
+            return res.status(200).json({ message: 'Message, sended!' })
+        }
         let msg = {
             'jiraIssues': {
                 'jql': req.body.jiraJQLRequest,
@@ -63,5 +83,40 @@ router.post('/push', async (req, res) => {
         res.status(500).json(`Enything went wrong while sending request. Current exception: ${e}`);
     }
 });
+
+/**
+ * @param {*} keywords 
+ * @param {*} sources 
+ * @returns true if we find report with current keywords and sources in cache
+ */
+const findInCache = (keywords, sources) => {
+    let founded = false;
+    console.log(KafkaConsumers.getReportsHistory().length);
+    KafkaConsumers.getReportsHistory().forEach((v) => {
+        if (v.keywords.every(k => keywords.includes(k)) &&
+            v.sources.every(s => sources.includes(s))) {
+            founded = true;
+        }
+    });
+
+    return founded;
+}
+
+/**
+ * @param {*} keywords 
+ * @param {*} sources 
+ * @returns report from cache
+ */
+const getReportFromCache = (keywords, sources) => {
+    let report = false;
+    KafkaConsumers.getReportsHistory().forEach((v) => {
+        if (v.keywords.every(k => keywords.includes(k)) &&
+            v.sources.every(s => sources.includes(s))) {
+            report = v;
+        }
+    });
+
+    return report;
+}
 
 module.exports = router;

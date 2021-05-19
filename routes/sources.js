@@ -21,7 +21,6 @@ const kafka = new Kafka({
  */
 router.post('/get', async (req, res) => {
     let sourcesHistory = KafkaConsumers.getSourceHistory();
-    logger.info('SOURCES: ' + JSON.stringify(sourcesHistory));
     res.send(sourcesHistory);
 });
 
