@@ -93,12 +93,27 @@ const findInCache = (keywords, sources) => {
     let founded = false;
     console.log(KafkaConsumers.getReportsHistory().length);
     KafkaConsumers.getReportsHistory().forEach((v) => {
-        if (v.keywords.every(k => keywords.includes(k)) &&
-            v.sources.every(s => sources.includes(s))) {
+        if (checkIdentity(v, keywords, sources)) {
             founded = true;
         }
     });
 
+    return founded;
+}
+
+/**
+ * Check report and current report from cache identity
+ * @param {*} v 
+ * @param {*} keywords 
+ * @param {*} sources 
+ * @returns true if they identy
+ */
+const checkIdentity = (v, keywords, sources) => {
+    let founded = false;
+    if ((v.keywords.every(k => keywords.includes(k)) && v.sources.every(s => sources.includes(s))) &&
+        (keywords.every(k => v.keywords.includes(k)) && sources.every(s => v.sources.includes(s)))) {
+        founded = true;
+    }
     return founded;
 }
 
@@ -110,8 +125,7 @@ const findInCache = (keywords, sources) => {
 const getReportFromCache = (keywords, sources) => {
     let report = false;
     KafkaConsumers.getReportsHistory().forEach((v) => {
-        if (v.keywords.every(k => keywords.includes(k)) &&
-            v.sources.every(s => sources.includes(s))) {
+        if (checkIdentity(v, keywords, sources)) {
             report = v;
         }
     });
